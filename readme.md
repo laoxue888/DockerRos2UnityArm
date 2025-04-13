@@ -4,6 +4,8 @@
 
 ## 前言（Introduction）
 
+![alt text](images/test.gif)
+
 **当机器人遇上游戏引擎：用Unity玩转机械臂仿真，妈妈再也不用担心我的Gazebo崩溃了！**
 
 想用Gazebo给机器人搞个仿真？恭喜你，即将开启“从入门到放弃”的经典副本——环境配置复杂得像解一道高数题，而构建复杂场景时，Gazebo可能会用“卡顿”和“崩溃”来考验你的耐心。尤其对新手来说，光是搞明白为什么模型突然飞天遁地，就足以让人怀疑人生。
@@ -42,7 +44,7 @@ Today, we’re doing something fun: **simulating a robotic arm in Unity and cont
 Ready to make your robotic arm dance in Unity? Let’s go! (Gazebo: "But... I was here first...")
 
 
-![alt text](images/test.gif)
+
 
 > 参考：
 > - [docker-ros2-unity-tcp-endpoint](https://github.com/frankjoshua/docker-ros2-unity-tcp-endpoint/tree/master)
@@ -72,7 +74,7 @@ Ready to make your robotic arm dance in Unity? Let’s go! (Gazebo: "But... I wa
 ❇️创建Docker容器
 
 ```shell
-docker run -it -p 6080:80 -p 10000:10000 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=host.docker.internal:0.0 --gpus=all --name=Ros2UnityCar docker.1ms.run/ubuntu:24.04  /bin/bash
+docker run -it -p 6080:80 -p 10000:10000 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=host.docker.internal:0.0 --gpus=all --name=Ros2UnityArm docker.1ms.run/ubuntu:24.04  /bin/bash
 ```
 
 ❇️安装相关软件
