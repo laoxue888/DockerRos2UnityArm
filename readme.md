@@ -1,12 +1,48 @@
 
----
 
+---
 
 ## 前言（Introduction）
 
-使用gazebo仿真可以进行机器人与环境交互的仿真，但是仿真环境搭建起来比较复杂，尤其是对于初学者来说，并且难以构建复杂的仿真环境。因此，使用Unity搭建仿真环境会更加简单，并且可以构建更加复杂的仿真环境。
+**当机器人遇上游戏引擎：用Unity玩转机械臂仿真，妈妈再也不用担心我的Gazebo崩溃了！**
 
-反正我用gazebo有时候挺抓狂的，各种报错。
+想用Gazebo给机器人搞个仿真？恭喜你，即将开启“从入门到放弃”的经典副本——环境配置复杂得像解一道高数题，而构建复杂场景时，Gazebo可能会用“卡顿”和“崩溃”来考验你的耐心。尤其对新手来说，光是搞明白为什么模型突然飞天遁地，就足以让人怀疑人生。
+
+但别慌！这里有个更快乐（且不会让你头秃）的方案——**用Unity搭建仿真环境！** 没错，就是那个做《原神》和《王者荣耀》的Unity！它不仅能让你像搭积木一样轻松构建场景，还能搞定Gazebo挠破头都难实现的复杂环境（比如让机械臂在火星捡土豆，或者在水下拧瓶盖）。
+
+今天，我们就来点好玩的：**用Unity仿真一个机械臂，再通过ROS2和RViz远程操控它！** 从此，你可以在Unity里造个虚拟实验室，而ROS2负责当“传话小哥”，让现实和仿真无缝对接。
+
+**为什么选Unity？**
+
+- **简单到流泪**：拖拖拽拽就能建场景，不用再和URDF文件“打架”。
+
+- **画质狂魔**：想要光影效果？想要真实物理？Unity表示：“就这？”
+
+- **ROS2的好基友**：通过ROS-TCP-Connector，Unity和ROS2秒变最佳拍档。
+
+准备好让你的机械臂在Unity里跳个舞了吗？Let’s go！（Gazebo：明明是我先来的……）
+
+
+**When Robots Meet Game Engines: Simulating Robotic Arms with Unity—Because Gazebo Crashes Are So Last Season!**
+
+Trying to set up a robot simulation in Gazebo? Congratulations, you’re about to embark on the classic "From Beginner to Burnout" quest—where environment configuration feels like solving advanced calculus, and building complex scenes comes with Gazebo’s signature "lag-and-crash" combo. For beginners, just figuring out why your robot suddenly decided to phase through the floor or launch into orbit is enough to trigger an existential crisis.
+
+But fear not! There’s a far more joyful (and less hair-pulling) alternative—**building your simulation in Unity!** Yep, the same Unity behind Genshin Impact and Honor of Kings. Not only does it let you assemble scenes like virtual LEGO, but it also handles complex environments that would make Gazebo sweat bullets (think robotic arms picking potatoes on Mars or unscrewing bottles underwater).
+
+Today, we’re doing something fun: **simulating a robotic arm in Unity and controlling it remotely via ROS2 and RViz!** Now you can build a virtual lab in Unity while ROS2 acts as the middleman, seamlessly bridging simulation and reality.
+
+**Why Unity?**
+
+- **So easy it hurts**—Drag, drop, and build scenes without wrestling with URDF files.
+
+- **Graphics wizardry**—Want realistic lighting and physics? Unity scoffs, "Is that all?"
+
+- **ROS2’s best buddy**—With ROS-TCP-Connector, Unity and ROS2 become the ultimate dynamic duo.
+
+Ready to make your robotic arm dance in Unity? Let’s go! (Gazebo: "But... I was here first...")
+
+
+![alt text](images/test.gif)
 
 > 参考：
 > - [docker-ros2-unity-tcp-endpoint](https://github.com/frankjoshua/docker-ros2-unity-tcp-endpoint/tree/master)
@@ -17,11 +53,11 @@
 > - [moveit2_yolobb_ws](https://github.com/laoxue888/moveit2_yolobb_ws)
 > - [Unity-Robotics-Hub](https://github.com/Unity-Technologies/Unity-Robotics-Hub)
 
-![alt text](images/test.gif)
+
 
 ## 搭建开发环境（Setup Development Environment）
 
-> - Unity:2020
+> - Unity:2022
 > - Ubuntu:24.04
 > - Ros2:jazzy
 
@@ -39,16 +75,6 @@
 docker run -it -p 6080:80 -p 10000:10000 -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=host.docker.internal:0.0 --gpus=all --name=Ros2UnityCar docker.1ms.run/ubuntu:24.04  /bin/bash
 ```
 
-😂【可选】介绍另外一种方法：借助Docker的网页桌面功能，可以不用安装vncserver。[docker-webtop](https://github.com/linuxserver/docker-webtop)
-
-```shell
-# 可选
-docker run -d --name Ros2UnityCar --security-opt seccomp=unconfined --gpus=all -e PUID=1000 -e PGID=1000 -e TZ="Asia/Shanghai" -p 3000:3000 -p 3001:3001 -p 10000:10000 lscr.io/linuxserver/webtop:ubuntu-xfce # ubuntu:24.04 科学上网下载速度更快
-
-# 查看Ubuntu版本的命令
-lsb_release -a
-```
-
 ❇️安装相关软件
 
 ```shell
@@ -57,13 +83,6 @@ apt-get update
 apt install wget -y
 wget http://fishros.com/install -O fishros && bash fishros
 
-# 打开新的终端，安装gz
-sudo apt-get update
-sudo apt-get install curl lsb-release gnupg -y
-sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-sudo apt-get update -y
-sudo apt-get install gz-harmonic -y
 
 # 安装远程显示服务程序
 apt-get install x11-xserver-utils
@@ -88,27 +107,21 @@ apt install ros-${ROS_DISTRO}-gz-ros2-control -y
 
 # 用于调试，可不安装
 apt-get install gdb -y
-
-# 安装python第三方库
-apt install python3-pip -y
-pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-pip install pyside6 xacro ultralytics NodeGraphQt --break-system-packages
-pip install -U colcon-common-extensions vcstool --break-system-packages
-
-pip install pygame --break-system-packages
 ```
 
 ## 运行测试（Run test）
 
-❇️打开Unity项目
+```shell
+source install/setup.bash
+ros2 launch ros_tcp_endpoint endpoint.launch.py
+```
 
-![alt text](images/image.png)
+```shell
+source install/setup.bash
+ros2 run unity_control_example follow_joint_trajectory_monitor
+```
 
-![alt text](images/image-1.png)
-
-❇️打开ROS2项目
-
-![alt text](images/image-2.png)
-
-
-![alt text](images/test.gif)
+```shell
+source install/setup.bash
+ros2 launch niryo_one_moveit_config demo.launch.py
+```
