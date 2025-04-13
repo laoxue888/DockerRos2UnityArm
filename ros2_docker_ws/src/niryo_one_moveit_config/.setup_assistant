@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: niryo_one_description
+    relative_path: urdf/niryo_one.urdf.xacro
+  srdf:
+    relative_path: config/niryo_one.srdf
+  package_settings:
+    author_name: laoxue
+    author_email: laoxue@qq.com
+    generated_timestamp: 1744510574
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="niryo_one">
+    <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+
+    <!-- Import niryo_one urdf file -->
+    <xacro:include filename="$(find niryo_one_description)/urdf/niryo_one.urdf.xacro" />
+
+    <!-- Import control_xacro -->
+    <xacro:include filename="niryo_one.ros2_control.xacro" />
+
+
+    <xacro:niryo_one_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
+
+</robot>
