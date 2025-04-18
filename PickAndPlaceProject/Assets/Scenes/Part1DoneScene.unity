@@ -36278,6 +36278,7 @@ GameObject:
   - component: {fileID: 1483865376}
   - component: {fileID: 1483865375}
   - component: {fileID: 1483865377}
+  - component: {fileID: 1483865378}
   m_Layer: 0
   m_Name: Publisher
   m_TagString: Untagged
@@ -36332,6 +36333,19 @@ MonoBehaviour:
   m_NiryoOne: {fileID: 1808573332}
   m_Target: {fileID: 1420725132}
   m_TargetPlacement: {fileID: 1019047338}
+--- !u!114 &1483865378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1483865374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c52d903df49662044acb8e72faa08124, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Target: {fileID: 1420725132}
 --- !u!43 &1484741888
 Mesh:
   m_ObjectHideFlags: 0
