@@ -85,23 +85,24 @@ class MoverServiceServer(Node):
         # 填充响应, 规划完后返回 RobotTrajectory[] trajectories
         # ------------------------------------------------
         # Pre grasp - position gripper directly above target object
-        # geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=0.3251306384334037, y=-0.00011786139226348373, z=0.2591435232868775), orientation=geometry_msgs.msg.Quaternion(x=0.6168519094330289, y=0.6164980955928598, z=0.3459624507522454, w=0.34602572538570503))
-        # pick_pose.position.x = 0.2251306384334037
-        # pick_pose.position.y = 0.117186139226348373
-        pick_pose.position.z = 0.3591435232868775
-        # pick_pose.orientation.x = 0.6168519094330289
-        # pick_pose.orientation.y = 0.6164980955928598
-        # pick_pose.orientation.z = 0.3459624507522454
-        # pick_pose.orientation.w = 0.34602572538570503
+        # pick_pose.position.x=pick_pose.position.x
+        pick_pose.position.x=0.17
+        pick_pose.position.y=0.0
+        pick_pose.position.z=1.0
+
+        # pick_pose.orientation.x=0.5
+        # pick_pose.orientation.y=0.5
+        # pick_pose.orientation.z=0.5
+        # pick_pose.orientation.w=0.5
 
         # rviz2执行动作
-        self.moveit2.move_to_pose(position=pick_pose.position, quat_xyzw=pick_pose.orientation, target_link='hand_link')
+        self.moveit2.move_to_pose(position=pick_pose.position, quat_xyzw=pick_pose.orientation)
 
         pre_grasp_pose_joint_trajectory = self.moveit2.plan(position=pick_pose.position, quat_xyzw=pick_pose.orientation, target_link='hand_link')
         pre_grasp_pose = RobotTrajectory()
         pre_grasp_pose.joint_trajectory = pre_grasp_pose_joint_trajectory
         # If the trajectory has no points, planning has failed and we return an empty response
-        if not pre_grasp_pose.joint_trajectory.points:
+        if not pre_grasp_pose:
             return response
         response.trajectories.append(pre_grasp_pose)
 

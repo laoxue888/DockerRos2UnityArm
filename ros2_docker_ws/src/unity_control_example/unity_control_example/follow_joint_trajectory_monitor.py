@@ -10,6 +10,9 @@ from trajectory_msgs.msg import JointTrajectory
 class FollowJointTrajectoryMonitor(Node):
     def __init__(self):
         super().__init__('follow_joint_trajectory_monitor')
+
+        # group_name = 'niryo_one_arm'
+        group_name = 'panda_arm'
         
         # 设置QoS配置以匹配动作服务器
         qos_profile = QoSProfile(
@@ -20,7 +23,7 @@ class FollowJointTrajectoryMonitor(Node):
         # 订阅动作状态主题
         self._status_sub = self.create_subscription(
             GoalStatusArray,
-            '/niryo_one_arm_controller/follow_joint_trajectory/_action/status',
+            '/{}_controller/follow_joint_trajectory/_action/status'.format(group_name),
             self._status_callback,
             qos_profile
         )
@@ -28,12 +31,12 @@ class FollowJointTrajectoryMonitor(Node):
         # 订阅反馈主题
         self._feedback_sub = self.create_subscription(
             FollowJointTrajectory.Impl.FeedbackMessage,
-            '/niryo_one_arm_controller/follow_joint_trajectory/_action/feedback',
+            '/{}_controller/follow_joint_trajectory/_action/feedback'.format(group_name),
             self._feedback_callback,
             qos_profile
         )
 
-        self.get_logger().info('开始监听/niryo_one_arm_controller/follow_joint_trajectory动作信息...')
+        self.get_logger().info('开始监听/{}_controller/follow_joint_trajectory动作信息...'.format(group_name))
 
         self.i_test = 0
         # 发布话题
