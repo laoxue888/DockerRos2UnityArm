@@ -14,6 +14,9 @@
 
 ```shell
 apt install python3-pip -y
+apt-get install portaudio19-dev -y
+apt-get install x11-xserver-utils
+apt install libxcb* -y
 
 # 使用清华源下载
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --break-system-packages

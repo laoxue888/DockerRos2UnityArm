@@ -15,5 +15,7 @@ pyttsx3==2.98
 openai==1.74.0
 vosk==0.3.45
 ChatTTS==0.2.3
+edge-tts
+playsound
 # 安装pytorch
 # pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 --index-url https://download.pytorch.org/whl/cu124
