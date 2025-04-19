@@ -6,9 +6,9 @@
         "limitSymbolsToIncludedHeaders": false
       },
       "includePath": [
-        "/root/ws_panda_arm_pymoveit2/install/niryo_moveit/include/**",
+        "/root/ros2_docker_ws/install/niryo_moveit/include/**",
         "/opt/ros/jazzy/include/**",
-        "/root/ws_panda_arm_pymoveit2/src/niryo_moveit/include/**",
+        "/root/ros2_docker_ws/src/niryo_moveit/include/**",
         "/usr/include/**"
       ],
       "name": "ROS",
