@@ -1,16 +1,16 @@
 {
     "python.autoComplete.extraPaths": [
-        "/root/ws_panda_arm_pymoveit2/install/unity_control_example/lib/python3.12/site-packages",
-        "/root/ws_panda_arm_pymoveit2/install/ros_tcp_endpoint/lib/python3.12/site-packages",
-        "/root/ws_panda_arm_pymoveit2/install/pymoveit2/lib/python3.12/site-packages",
-        "/root/ws_panda_arm_pymoveit2/install/niryo_moveit/lib/python3.12/site-packages",
+        "/root/ros2_docker_ws/install/unity_control_example/lib/python3.12/site-packages",
+        "/root/ros2_docker_ws/install/ros_tcp_endpoint/lib/python3.12/site-packages",
+        "/root/ros2_docker_ws/install/pymoveit2/lib/python3.12/site-packages",
+        "/root/ros2_docker_ws/install/niryo_moveit/lib/python3.12/site-packages",
         "/opt/ros/jazzy/lib/python3.12/site-packages"
     ],
     "python.analysis.extraPaths": [
-        "/root/ws_panda_arm_pymoveit2/install/unity_control_example/lib/python3.12/site-packages",
-        "/root/ws_panda_arm_pymoveit2/install/ros_tcp_endpoint/lib/python3.12/site-packages",
-        "/root/ws_panda_arm_pymoveit2/install/pymoveit2/lib/python3.12/site-packages",
-        "/root/ws_panda_arm_pymoveit2/install/niryo_moveit/lib/python3.12/site-packages",
+        "/root/ros2_docker_ws/install/unity_control_example/lib/python3.12/site-packages",
+        "/root/ros2_docker_ws/install/ros_tcp_endpoint/lib/python3.12/site-packages",
+        "/root/ros2_docker_ws/install/pymoveit2/lib/python3.12/site-packages",
+        "/root/ros2_docker_ws/install/niryo_moveit/lib/python3.12/site-packages",
         "/opt/ros/jazzy/lib/python3.12/site-packages"
     ]
 }
