@@ -18,7 +18,7 @@ def generate_launch_description():
         .robot_description(file_path="config/panda.urdf.xacro")
         .robot_description_semantic(file_path="config/panda.srdf")
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
-        .moveit_cpp(arm_robot_sim_path + "/config/controller_setting.yaml")
+        .moveit_cpp(arm_robot_sim_path + "/config/controller_setting.yaml") # controller_setting 手动创建的
         .to_moveit_configs()
     )
 
@@ -27,7 +27,7 @@ def generate_launch_description():
             Node(
                 name="moveit_py",
                 package='unity_control_example',
-                executable='mover_panda_arm',
+                executable='mover_panda_arm_server',
                 output="both",
                 parameters=[moveit_config.to_dict(),
                             {"use_sim_time": True},

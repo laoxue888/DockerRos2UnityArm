@@ -14,7 +14,8 @@ from moveit.planning import (
     MultiPipelinePlanRequestParameters,
 )
 from moveit.core.kinematic_constraints import construct_joint_constraint
-
+from panda_arm_msg.srv import ControlRvizArm, ControlRvizArm_Response
+import numpy as np
 def plan_and_execute(
     robot,
     planning_component,
@@ -51,7 +52,13 @@ class Controller(Node):
 
     def __init__(self):
         super().__init__('commander')
-
+        self.srv = self.create_service(
+            ControlRvizArm, 
+            'control_rviz_arm', 
+            self.handle_request)
+        self.before_position = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0])
+        self.before_gripper_state = 'close'
+        
         self.pose_goal = PoseStamped()
         self.pose_goal.header.frame_id = "panda_link0"
         # instantiate MoveItPy instance and get planning component
@@ -62,12 +69,7 @@ class Controller(Node):
 
         robot_model = self.panda.get_robot_model()
         self.robot_state = RobotState(robot_model)
-
-        self.height = 0.18
-        self.pick_height = 0.126
-        self.carrying_height = 0.3
-        self.init_angle = -0.3825
-
+    
     # function to move a gripper
     def move_to(self, x, y, z, xo, yo, zo, wo):
 
@@ -101,32 +103,51 @@ class Controller(Node):
         self.panda_hand.set_goal_state(motion_plan_constraints=[joint_constraint])
         plan_and_execute(self.panda, self.panda_hand, self.logger, sleep_time=3.0)
 
-    def move_to_goal(self, x, y, z):
+    def handle_request(self, request, response):
+        """"""
+        position = request.position
+        gripper_state = request.open_or_close
+        # print(f"Received request: {request}")
+        # 使用服务通信
+        self.move_to(position[0], position[1], position[2], position[3], position[4], position[5], position[6])
 
-        self.get_logger().info(f"moving to {x}, {y}, {z}")
+        if gripper_state != self.before_gripper_state:
+            if gripper_state == 'open':
+                self.gripper_action("open")
+            elif gripper_state == 'close':
+                self.gripper_action("close")
+            else:
+                self.get_logger().info("no such action")
 
-        self.move_to(x, y, z, 1.0, self.init_angle, 0.0, 0.0)
+        self.before_position = position
+        self.before_gripper_state = gripper_state
 
-        self.gripper_action("open")
+        response = ControlRvizArm_Response()
+        response.success = True
+        return response
 
-        # self.move_to(data.data[0], data.data[1], self.pick_height, 1.0, self.init_angle + data.data[2], 0.0, 0.0)
+def main():
+    """"""
+    rclpy.init(args=None)
 
-        # self.gripper_action("close")
+    controller = Controller()
 
-        # self.move_to(data.data[0], data.data[1], self.carrying_height, 1.0, self.init_angle + data.data[2], 0.0, 0.0)
+    executor = rclpy.executors.MultiThreadedExecutor()
+    executor.add_node(controller)
 
-        # self.move_to(0.3, -0.3, self.carrying_height, 1.0, self.init_angle + data.data[2], 0.0, 0.0)
+    executor_thread = threading.Thread(target=executor.spin, daemon=True)
+    executor_thread.start()
 
-        # self.gripper_action("open")
+    rate = controller.create_rate(2)
+    try:
+        while rclpy.ok():
+            rate.sleep()
+    except KeyboardInterrupt:
+        pass
 
-def main(args=None):
-    rclpy.init(args=args)
-    monitor = Controller()
-    monitor.move_to_goal(0.2, 0.3, 0.3) # 看rviz，如果发生碰撞的话，先移动一下，否则无法执行成功！
-    rclpy.spin(monitor)
-    monitor.destroy_node()
     rclpy.shutdown()
-
+    executor_thread.join()
 
 if __name__ == '__main__':
+    """"""
     main()

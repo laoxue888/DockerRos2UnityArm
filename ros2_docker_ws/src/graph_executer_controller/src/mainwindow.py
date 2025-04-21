@@ -26,7 +26,6 @@ class MainWindow(QMainWindow, QObject):
         self.userSettings['graph_session'] = ['', 'str']
         self.settings_dir = os.path.join(os.getcwd(), "settings")
 
-        self.graph_session_is_changed = False
         self.loadSettings()
 
         self.setWindowIcon(QIcon(os.path.join(os.getcwd(), "settings", "myicon.png")))
@@ -50,10 +49,10 @@ class MainWindow(QMainWindow, QObject):
         except Exception as err:
             self.messageSignal.emit(err)
 
-        def saveSesionPath():
-            self.userSettings['graph_session'][0] = self.graph.graph.current_session()
-            self.graph_session_is_changed = True
-        self.graph.graph.session_changed.connect(saveSesionPath)
+        # def saveSesionPath():
+        #     self.userSettings['graph_session'][0] = self.graph.graph.current_session()
+        #     print("save session path: ", self.userSettings['graph_session'][0])
+        # self.graph.graph.session_changed.connect(saveSesionPath)
 
         self.ui.verticalLayout_graph.addWidget(self.graph.graph_widget)
         self.ui.actionexecute_graph.triggered.connect(self.graph.execute_all_nodes)
@@ -95,14 +94,15 @@ class MainWindow(QMainWindow, QObject):
 
     def saveSettings(self):
         """"""
-        settingsPath = os.path.join(self.settings_dir, self.__class__.__name__, "UserSettings.ini")
+        settingsPath = os.path.join(self.settings_dir, self.__class__.__name__, "UserSettings.conf")
         if os.path.exists(settingsPath):
-            settings = QSettings(settingsPath, QSettings.IniFormat)
+            settings = QSettings(settingsPath, QSettings.NativeFormat)
         else:
-            settings = QSettings(settingsPath, QSettings.IniFormat)
+            settings = QSettings(settingsPath, QSettings.NativeFormat)
 
         settings.beginGroup("user_settings")
         for key, value in self.userSettings.items():
+            print(key, self.userSettings[key][0])
             settings.setValue(key, self.userSettings[key][0])
 
         settings.endGroup()
@@ -111,8 +111,8 @@ class MainWindow(QMainWindow, QObject):
     def loadSettings(self):
         """"""
         try:
-            settingsPath = os.path.join(self.settings_dir, self.__class__.__name__, "UserSettings.ini")
-            settings = QSettings(settingsPath, QSettings.IniFormat)
+            settingsPath = os.path.join(self.settings_dir, self.__class__.__name__, "UserSettings.conf")
+            settings = QSettings(settingsPath, QSettings.NativeFormat)
             for key, value in self.userSettings.items():
                 if value[1]=='bool':
                     self.userSettings[key][0] = True if settings.value("user_settings/{}".format(key))=='true' else False
@@ -122,6 +122,7 @@ class MainWindow(QMainWindow, QObject):
             self.messageSignal.emit(err)
 
     def closeEvent(self, event):
+        self.userSettings['graph_session'][0] = self.graph.graph.current_session()
         self.saveSettings()
         self.messageSignal.emit("Close time: {}".format(datetime.datetime.now()))
         self.graph.save_session()

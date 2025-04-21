@@ -26,7 +26,7 @@ setup(
             'unity_control_node = unity_control_example.unity_control_node:main',
             'follow_joint_trajectory_monitor = unity_control_example.follow_joint_trajectory_monitor:main',
             'mover_service_server = unity_control_example.mover_service_server:main',
-            'mover_panda_arm = unity_control_example.mover_panda_arm:main',
+            'mover_panda_arm_server = unity_control_example.mover_panda_arm_server:main',
         ],
     },
 )

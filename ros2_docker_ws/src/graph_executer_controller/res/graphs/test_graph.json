@@ -1,0 +1,12 @@
+{
+  "graph":{
+    "layout_direction":0,
+    "acyclic":true,
+    "pipe_collision":false,
+    "pipe_slicing":true,
+    "pipe_style":1,
+    "accept_connection_types":{},
+    "reject_connection_types":{}
+  },
+  "nodes":{}
+}

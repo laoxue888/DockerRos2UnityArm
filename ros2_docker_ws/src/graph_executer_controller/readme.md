@@ -13,6 +13,7 @@
 ❇️配置开发环境
 
 ```shell
+sudo apt update
 apt install python3-pip -y
 apt-get install portaudio19-dev -y
 apt-get install x11-xserver-utils
@@ -25,8 +26,10 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --br
 ❇️运行
 
 ```shell
-cd src
+cd ros2_docker_ws
 source install/setup.bash
-cd graph_executer_controller
+
+cd src/graph_executer_controller
 python3 main.py
+
 ```
