@@ -12,5 +12,6 @@
         "/root/ros2_docker_ws/install/pymoveit2/lib/python3.12/site-packages",
         "/root/ros2_docker_ws/install/niryo_moveit/lib/python3.12/site-packages",
         "/opt/ros/jazzy/lib/python3.12/site-packages"
-    ]
+    ],
+    "idf.pythonInstallPath": "D:\\Espressif\\tools\\idf-python\\3.11.2\\python.exe"
 }
