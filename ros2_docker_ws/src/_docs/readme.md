@@ -63,12 +63,10 @@ apt-get update && apt-get install -y alsa-utils pulseaudio
 aplay -L  # 列出音频设备
 # speaker-test -t wav  # 测试播放
 
-
 # 使用清华源下载
 cd src/graph_executer_controller/
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --break-system-packages
 pip install pyqtgraph ultralytics --break-system-packages
-
 
 
 # 调试工具
