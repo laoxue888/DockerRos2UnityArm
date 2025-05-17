@@ -5,7 +5,7 @@ from utils.general import find_dir_path
 from PySide6.QtWidgets import QWidget
 from ui.ui_messageconsole import Ui_MessageConsole
 from PySide6.QtCore import Slot
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class MessageConsole(QWidget):
     def __init__(self,):
@@ -18,7 +18,7 @@ class MessageConsole(QWidget):
         # if not os.path.exists(self.log_dir):
         #     os.mkdir(self.log_dir)
         # self.logPath = os.path.join(self.log_dir, "{}.txt".format(time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())))
-        self.logPath = os.path.join(os.getcwd(), "logs")
+        self.logPath = os.path.join(BASE_DIR, "logs")
         if not os.path.isdir(self.logPath):
             os.makedirs(self.logPath)
         self.logPath = os.path.join(self.logPath, f"{time.strftime('%Y-%m-%d', time.localtime())}.txt")

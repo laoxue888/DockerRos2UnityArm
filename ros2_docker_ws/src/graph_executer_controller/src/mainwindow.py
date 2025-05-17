@@ -13,6 +13,8 @@ from src.GraphFlow import GraphFlow
 import webbrowser
 import json
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 class MainWindow(QMainWindow, QObject):
     messageSignal = Signal(str)
 
@@ -24,11 +26,11 @@ class MainWindow(QMainWindow, QObject):
         self.userSettings = OrderedDict()
         # save custom data format: 0: data；1: type, like as str、int、float etc
         self.userSettings['graph_session'] = ['', 'str']
-        self.settings_dir = os.path.join(os.getcwd(), "settings")
+        self.settings_dir = os.path.join(BASE_DIR, "settings")
 
         self.loadSettings()
 
-        self.setWindowIcon(QIcon(os.path.join(os.getcwd(), "settings", "myicon.png")))
+        self.setWindowIcon(QIcon(os.path.join(BASE_DIR, "settings", "myicon.png")))
         self.setIconSize(QSize(22, 22))
 
         self.updatelog = UpdateLog(self)
@@ -43,7 +45,8 @@ class MainWindow(QMainWindow, QObject):
 
     def initGui(self, ):
         """"""
-        self.graph = GraphFlow(messageSignal=self.messageSignal)
+        
+        self.graph = GraphFlow(self.messageSignal, self)
         try:
             self.graph.graph.load_session(self.userSettings['graph_session'][0])
         except Exception as err:
@@ -56,12 +59,12 @@ class MainWindow(QMainWindow, QObject):
 
         self.ui.verticalLayout_graph.addWidget(self.graph.graph_widget)
         self.ui.actionexecute_graph.triggered.connect(self.graph.execute_all_nodes)
-        self.ui.actionexetute_from_goal_node.triggered.connect(self.graph.execute_downstream)
+        self.ui.actionexetute_from_goal_node.triggered.connect(self.graph.execute_selected_nodes)
 
         self.ui.actionexetute_from_goal_node.setIcon(
-            QIcon(os.path.join(os.getcwd(), "settings", "BtnIcon","from_obj_node.png")))
+            QIcon(os.path.join(BASE_DIR, "settings", "BtnIcon","from_obj_node.png")))
         self.ui.actionexecute_graph.setIcon(
-            QIcon(os.path.join(os.getcwd(), "settings", "BtnIcon", "all_graph.png")))
+            QIcon(os.path.join(BASE_DIR, "settings", "BtnIcon", "all_graph.png")))
 
         def openLogDir():
             os.startfile(os.path.dirname(self.messageconsole.logPath))
@@ -69,7 +72,7 @@ class MainWindow(QMainWindow, QObject):
 
         # 打开用户教程
         def openUserGuide():
-            file_path = os.path.join(os.getcwd(), 'docs/userguide/site/index.html')
+            file_path = os.path.join(BASE_DIR, 'docs/userguide/site/index.html')
             webbrowser.open(file_path)
         self.ui.actionUserGuide.triggered.connect(openUserGuide)
 
@@ -78,7 +81,7 @@ class MainWindow(QMainWindow, QObject):
         self.ui.actionUpdate_log.triggered.connect(openUpdateLog)
 
         # change ui display language
-        with open(os.path.join(os.getcwd(), "settings", "languages", "en.json"), "r", encoding="utf-8") as f:
+        with open(os.path.join(BASE_DIR, "settings", "languages", "en.json"), "r", encoding="utf-8") as f:
             en_data = json.load(f)
             self.ui.menuHelp.setTitle(en_data["main_window"]["menuHelp"])
             self.ui.actionUpdate_log.setText(en_data["main_window"]["actionUpdate_log"])
@@ -90,7 +93,6 @@ class MainWindow(QMainWindow, QObject):
             self.ui.actionexecute_graph.setText(en_data["main_window"]["actionexecute_graph"])
             self.ui.actionWindow1.setText(en_data["main_window"]["actionWindow1"])
             self.ui.actionWindow2.setText(en_data["main_window"]["actionWindow2"])
-
 
     def saveSettings(self):
         """"""
@@ -126,6 +128,7 @@ class MainWindow(QMainWindow, QObject):
         self.saveSettings()
         self.messageSignal.emit("Close time: {}".format(datetime.datetime.now()))
         self.graph.save_session()
+        self.graph.close_event()
         return super().closeEvent(event)
 
 

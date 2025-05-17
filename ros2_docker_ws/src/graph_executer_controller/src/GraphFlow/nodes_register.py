@@ -12,15 +12,18 @@ from threading import Thread
 # import example nodes from the "nodes" sub-package
 from nodes import *
 import nodes
+import time
 
 # 然后正常使用 NodeGraphQt
 BASE_PATH = Path(__file__).parent.resolve()
 
-class GraphFlow:
-    def __init__(self,messageSignal):
+class GraphFlow(QtCore.QObject):
+
+    def __init__(self,messageSignal, parent=None):
         """"""
+        super(GraphFlow, self).__init__(parent)
         # create graph controller.
-        self.graph = NodeGraph()
+        self.graph = NodeGraph(parent=parent)
         self.graph_widget = self.graph.widget
         self.messageSignal = messageSignal
 
@@ -36,24 +39,6 @@ class GraphFlow:
                     self.messageSignal.emit(f'registered {node}')
                 except Exception as e:
                     self.messageSignal.emit(f'{e} load failed')
-        # for node in nodes_math.__all__:
-        #     try:
-        #         self.graph.register_node(eval("{}.{}".format('nodes_math', node)))
-        #         self.messageSignal.emit(f'registered {node}')
-        #     except Exception as e:
-        #         self.messageSignal.emit(f'{e} load failed')
-        # for node in nodes_read_data.__all__:
-        #     try:
-        #         self.graph.register_node(eval("{}.{}".format('nodes_read_data', node)))
-        #         self.messageSignal.emit(f'registered {node}')
-        #     except Exception as e:
-        #         self.messageSignal.emit(f'{e} load failed')
-        # for node in nodes_speech.__all__:
-        #     try:
-        #         self.graph.register_node(eval("{}.{}".format('nodes_speech', node)))
-        #         self.messageSignal.emit(f'registered {node}')
-        #     except Exception as e:
-        #         self.messageSignal.emit(f'{e} load failed')
         #######################################################################################
         # # auto layout nodes.
         self.graph.auto_layout_nodes()
@@ -62,7 +47,20 @@ class GraphFlow:
         self.graph.clear_selection()
         self.graph.fit_to_selection()
 
+        self.threads = {}
+
+        self.timeer_check_thread = QtCore.QTimer()
+        self.timeer_check_thread.timeout.connect(self.check_thread_status)
+        self.timeer_check_thread.start(500)
+
         self.init_gui()
+
+    def check_thread_status(self):
+        """检查线程状态"""
+        for node_name, thread in list(self.threads.items()):
+            if not thread.is_alive():
+                self.messageSignal.emit(f"Thread {node_name} has finished")
+                del self.threads[node_name]
 
     def init_gui(self):
         """初始化Graph的GUI"""
@@ -80,14 +78,25 @@ class GraphFlow:
 
         # wire function to "node_double_clicked" signal.
         self.graph.node_double_clicked.connect(display_properties_bin)
+        self.graph.nodes_deleted.connect(self.on_nodes_deleted)
+        self.graph.node_created.connect(self.on_node_created)
+    
+    def on_node_created(self,node_obj):
+        print(f"Node created: {node_obj}")
+        if hasattr(node_obj, 'set_widget_parent'):
+            node_obj.set_widget_parent(self) # 运行节点函数
 
-        # 加载
-        # try:
-        #     self.graph.load_session(os.path.join(os.getcwd(), 'docs', 'examples_graph','example_graph.json'))
-        # except Exception as err:
-        #     print(err)
+    def on_nodes_deleted(self, node_id):
+        print(f"Node deleted: {node_id}")
 
-    def execute_downstream(self):
+    def stop_all_nodes(self):
+        """停止所有节点的执行"""
+        all_nodes = self.graph.all_nodes()
+        for node in all_nodes:
+            if hasattr(node, 'stop_execute'):
+                 node.stop_execute()
+
+    def execute_selected_nodes(self):
         """从选定节点开始执行下游节点"""
         selected_nodes = self.graph.selected_nodes()
         if not selected_nodes:
@@ -106,13 +115,19 @@ class GraphFlow:
             except Exception as err:
                 messageSignal.emit(f"Thread error: {err}")
 
-        # 可以在这里创建多线程去执行，每一个初始节点创建一个线程
-        thread = Thread(target=run_graph, args=(self.messageSignal,), daemon=True)
-        thread.start()
-        # self.messageSignal.emit("=== 执行完成 ===\n")
+        if start_node.NODE_NAME not in self.threads.keys():
+            # 可以在这里创建多线程去执行，每一个初始节点创建一个线程
+            thread = Thread(target=run_graph, name=start_node.NODE_NAME, args=(self.messageSignal,), daemon=True)
+            thread.start()
+            self.threads[start_node.NODE_NAME] = thread
+        else:
+            self.messageSignal.emit(f"Thread {start_node.NODE_NAME} is already running")
 
     def execute_all_nodes(self):
         """执行图中的所有节点（按依赖顺序）"""
+        # self.stop_all_nodes()
+        # time.sleep(1)  # 等待节点停止
+
         all_nodes = self.graph.all_nodes()
 
         # 找到所有没有输出的节点作为目标节点
@@ -138,9 +153,14 @@ class GraphFlow:
 
         # 可以在这里创建多线程去执行，每一个初始节点创建一个线程
         for obj_node in obj_nodes:
-            thread = Thread(target=run_graph, args=(obj_node, self.messageSignal), daemon=True)
-            thread.start()
-        # self.messageSignal.emit("=== 全部执行完成 ===\n")
+            if obj_node.NODE_NAME not in self.threads.keys():
+                # 可以在这里创建多线程去执行，每一个初始节点创建一个线程
+                thread = Thread(target=run_graph, name=obj_node.NODE_NAME, args=(obj_node, self.messageSignal,), daemon=True)
+                thread.start()
+                self.threads[obj_node.NODE_NAME] = thread
+            else:
+                self.messageSignal.emit(f"Thread {obj_node.NODE_NAME} is already running")
+
 
     def get_execution_order(self, obj_node):
         """获取从指定节点开始的下游节点执行顺序（拓扑排序）"""
@@ -174,7 +194,6 @@ class GraphFlow:
             viewer.message_dialog(msg, title='Session Saved')
         else:
             self.save_session_as()
-
 
     def save_session_as(self,):
         """
@@ -219,4 +238,10 @@ class GraphFlow:
 
         if file_path:
             save_session(file_path)
+
+    def close_event(self,):
+        all_nodes = self.graph.all_nodes()
+        for node in all_nodes:
+            if hasattr(node, 'close_node'):
+                 node.close_node() # 运行节点函数
 

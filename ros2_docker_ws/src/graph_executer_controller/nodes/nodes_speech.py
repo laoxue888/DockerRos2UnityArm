@@ -13,8 +13,31 @@ import edge_tts
 import asyncio
 import tempfile
 from playsound import playsound
+from utils.general import get_execution_order
 
-__all__ = ['WhisperRecognitionNode', 'Pyttsx3SpeakNode', 'VOSKRecognitionNode', 'EdgeTTSSpeakNode']
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+__all__ = ['WhisperRecognitionNode', 'Pyttsx3SpeakNode', 'VOSKRecognitionNode', 'EdgeTTSSpeakNode', 'TextInputNode']
+
+
+class TextInputNode(BaseNode):
+    """打印节点，输出结果"""
+    __identifier__ = 'nodes.speech'
+    NODE_NAME = 'Text input'
+
+    def __init__(self):
+        super(TextInputNode, self).__init__()
+        self.add_text_input('text_in')
+        self.add_output('text_out')
+        self.text_out = ""
+
+    def execute(self):
+        self.text_out = self.get_property('text_in')
+        self.messageSignal.emit(f'{self.NODE_NAME} executed.')
+
+    def set_messageSignal(self, messageSignal):
+        self.messageSignal = messageSignal
+
 
 class EdgeTTSSpeakNode(BaseNode):
     """打印节点，输出结果"""
@@ -31,8 +54,6 @@ class EdgeTTSSpeakNode(BaseNode):
         self.engine.setProperty('rate', 150)  # 语速
         self.add_input('text_in')
 
-        self.add_checkbox('isConversationLoop', text='是否开启对话循环')
-
     def execute(self):
         """"""
         text = self.input(0).connected_ports()[0].node().text_out
@@ -40,10 +61,6 @@ class EdgeTTSSpeakNode(BaseNode):
         asyncio.run(self.play_with_playsound(text))
 
         self.messageSignal.emit(f'{self.NODE_NAME} executed.')
-
-        if self.get_property('isConversationLoop'):
-            # 遍历前置节点，并保存到一个列表中
-            self.get_execution_order(self) # 遍历前置节点，再执行它们
 
     async def play_with_playsound(self,text):
         voice = 'zh-CN-XiaoxiaoNeural'
@@ -87,7 +104,7 @@ class EdgeTTSSpeakNode(BaseNode):
 
 
 class VOSKRecognitionNode(BaseNode):
-    """打印节点，输出结果"""
+    """科学上网下载速度才快，否则只有几十kb/s"""
     __identifier__ = 'nodes.speech'
     NODE_NAME = 'Speech recognition by vosk'
 
@@ -96,11 +113,11 @@ class VOSKRecognitionNode(BaseNode):
         # 加载模型
         # https://alphacephei.com/vosk/models/vosk-model-small-cn-0.22.zip         41.87 M
         # https://alphacephei.com/vosk/models/vosk-model-cn-0.15.zip                1.67 G
-        models_dir = os.path.join(os.getcwd(), 'res', 'models', 'VOSK')
+        models_dir = os.path.join(BASE_DIR, 'res', 'models', 'VOSK')
         if not os.path.exists(models_dir):
             os.makedirs(models_dir)
 
-        model_dir = os.path.join(os.getcwd(), 'res', 'models', 'VOSK', 'vosk-model-cn-0.15')
+        model_dir = os.path.join(BASE_DIR, 'res', 'models', 'VOSK', 'vosk-model-cn-0.15')
         if os.path.exists(model_dir):
             self.vosk_model = Model(model_dir)
         else:

@@ -10,6 +10,21 @@ import os
 import zipfile
 import requests
 
+def get_execution_order(obj_node):
+        """获取从指定节点开始的下游节点执行顺序（拓扑排序）"""
+        visited = set()
+        execution_order = []
+        def visit_up(node):
+            if node in visited:
+                return
+            # 首先处理所有上游节点
+            for port in node.inputs().values():
+                for connected_port in port.connected_ports():
+                    visit_up(connected_port.node())
+            visited.add(node)
+            execution_order.append(node)
+        visit_up(obj_node)
+        return execution_order
 
 def download_and_extract_zip(url, download_folder, extract_folder=None):
     """

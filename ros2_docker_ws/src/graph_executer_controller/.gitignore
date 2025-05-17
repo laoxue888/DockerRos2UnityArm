@@ -1,5 +1,4 @@
 
-/res/models/VOSK
-/res/models/FunASR
+/res/models/VOSK/vosk-model-cn-0.15
 
 /logs/*.txt

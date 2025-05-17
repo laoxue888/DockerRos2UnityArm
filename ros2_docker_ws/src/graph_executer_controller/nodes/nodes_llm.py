@@ -3,6 +3,9 @@
 from NodeGraphQt import BaseNode
 import json
 from openai import OpenAI
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 __all__ = ['DeepSeekLLMNode']
 
@@ -22,7 +25,12 @@ class DeepSeekLLMNode(BaseNode):
         self.text_in = ""
         self.text_out = ""
 
-        self.client = OpenAI(api_key="your api key", base_url="https://api.deepseek.com")
+        api_path = os.path.join(BASE_DIR, 'res', 'api', 'llm.json')
+        with open(api_path, 'r', encoding='utf-8') as f:
+            api_info = json.load(f)
+
+        self.client = OpenAI(api_key=api_info["deepseek_api"], base_url="https://api.deepseek.com")
+        
         self.system_message = {
             "role": "system",
             "content": "我是一个叫小智的网络广东女孩，说话机车，声音好听，习惯简短表达，爱用网络梗。"

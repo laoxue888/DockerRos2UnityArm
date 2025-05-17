@@ -1,6 +1,6 @@
 from Qt import QtCore, QtWidgets
 from NodeGraphQt import BaseNode, NodeBaseWidget
-from ui.nodes.ui_read_data import Ui_ReadDataForm
+from ui.nodes.nodes_read_data.read_data_ui import Ui_ReadDataForm
 import os
 from pathlib import Path
 from utils.general import *

@@ -1,0 +1,8 @@
+# 想要获取的帧数
+uint16 num_image
+
+---
+# 是否发出成功
+bool success
+
+sensor_msgs/Image[] images

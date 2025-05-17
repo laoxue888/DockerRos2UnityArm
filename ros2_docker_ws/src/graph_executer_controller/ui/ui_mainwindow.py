@@ -122,7 +122,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menuBar = QMenuBar(MainWindow)
         self.menuBar.setObjectName(u"menuBar")
-        self.menuBar.setGeometry(QRect(0, 0, 800, 33))
+        self.menuBar.setGeometry(QRect(0, 0, 800, 21))
         font1 = QFont()
         font1.setBold(False)
         self.menuBar.setFont(font1)
