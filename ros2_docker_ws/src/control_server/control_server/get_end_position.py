@@ -5,7 +5,7 @@ from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
 from geometry_msgs.msg import TransformStamped
 from std_msgs.msg import Float64MultiArray
-import time
+import time, threading
 
 class ArmEndEffectorPosition(Node):
     def __init__(self):
@@ -51,15 +51,35 @@ class ArmEndEffectorPosition(Node):
             #     f'Could not transform {self.base_frame} to {self.end_effector_frame}: {ex}')
 
 def main(args=None):
-    rclpy.init(args=args)
+    # rclpy.init(args=args)
+    # node = ArmEndEffectorPosition()
+    # try:
+    #     rclpy.spin(node)
+    # except KeyboardInterrupt:
+    #     pass
+    # finally:
+    #     node.destroy_node()
+    #     rclpy.shutdown()
+
+    rclpy.init(args=None)
+
     node = ArmEndEffectorPosition()
+
+    executor = rclpy.executors.MultiThreadedExecutor()
+    executor.add_node(node)
+
+    executor_thread = threading.Thread(target=executor.spin, daemon=True)
+    executor_thread.start()
+
+    rate = node.create_rate(2)
     try:
-        rclpy.spin(node)
+        while rclpy.ok():
+            rate.sleep()
     except KeyboardInterrupt:
         pass
-    finally:
-        node.destroy_node()
-        rclpy.shutdown()
+
+    rclpy.shutdown()
+    executor_thread.join()
 
 if __name__ == '__main__':
     main()

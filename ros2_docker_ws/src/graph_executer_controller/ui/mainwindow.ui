@@ -232,7 +232,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionexetute_from_goal_node"/>
-   <addaction name="actionexecute_graph"/>
   </widget>
   <action name="actionCheck_for_updates">
    <property name="text">

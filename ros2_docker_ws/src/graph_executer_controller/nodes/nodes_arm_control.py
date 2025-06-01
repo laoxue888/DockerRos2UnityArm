@@ -4,7 +4,8 @@ from NodeGraphQt import BaseNode, NodeBaseWidget
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import JointState
-from panda_arm_msg.srv import ControlRvizArm, ControlRvizArm_Request
+from panda_arm_msg.srv import ControlRvizArm, ControlRvizArm_Request, ControlUnityArm, ControlUnityArm_Request
+from panda_arm_msg.srv import ControlUnityArmGripper, ControlUnityArmGripper_Request
 import rclpy
 from openai import OpenAI
 from tf2_ros import TransformException
@@ -67,7 +68,7 @@ class PandaArmDeepSeekControlNode(BaseNode):
     def create_ros2_node(self,):
         """"""
         self.srv_node = Node(self.NODE_NAME.replace(' ', '_'))
-        self.cli = self.srv_node.create_client(ControlRvizArm, 'control_rviz_arm')
+        self.client_arm = self.srv_node.create_client(ControlRvizArm, 'control_rviz_arm')
         self.sub_end_pose = self.srv_node.create_subscription(
             Float64MultiArray,
             '/end_effector_pose',
@@ -95,7 +96,7 @@ class PandaArmDeepSeekControlNode(BaseNode):
         if not self.is_created_node:
             self.create_ros2_node()
 
-        while not self.cli.wait_for_service(timeout_sec=1.0):
+        while not self.client_arm.wait_for_service(timeout_sec=1.0):
             self.srv_node.get_logger().info('service not available, waiting again...')
 
         # 获取语音节点的文本输入
@@ -150,7 +151,7 @@ class PandaArmDeepSeekControlNode(BaseNode):
                             float(data_json['orientation.w'])]
         request.open_or_close = data_json['gripper_state']
         
-        future = self.cli.call_async(request)
+        future = self.client_arm.call_async(request)
         rclpy.spin_until_future_complete(self.srv_node, future)
 
         response = future.result()
@@ -231,18 +232,19 @@ class PandaArmControlNode(BaseNode):
         self.add_text_input('position.x', 'position.x', text='0.3')
         self.add_text_input('position.y', 'position.y', text='0.3')
         self.add_text_input('position.z', 'position.z', text='0.3')
-        self.add_text_input('orientation.x', 'orientation.x', text='0.0')
+        self.add_text_input('orientation.x', 'orientation.x', text='1.0')
         self.add_text_input('orientation.y', 'orientation.y', text='0.0')
         self.add_text_input('orientation.z', 'orientation.z', text='0.0')
         self.add_text_input('orientation.w', 'orientation.w', text='0.0')
-
-        self.add_combo_menu('gripper_state', 'gripper_state', items=['open', 'close'])
+        self.add_text_input('gripper_position', 'gripper_position', text='0.04')
 
         self.is_created_node = False
 
     def create_ros2_node(self,):
         self.srv_node = Node(self.NODE_NAME.replace(' ', '_'))
-        self.cli = self.srv_node.create_client(ControlRvizArm, 'control_rviz_arm')
+        self.client_arm = self.srv_node.create_client(ControlRvizArm, 'control_rviz_arm')
+        self.client_gripper = self.srv_node.create_client(ControlUnityArmGripper, 'control_unity_arm_gripper')
+        self.client_send_trajectory = self.srv_node.create_client(ControlUnityArm, 'control_unity_arm')
         self.sub_end_pose = self.srv_node.create_subscription(
             Float64MultiArray,
             '/end_effector_pose',
@@ -262,7 +264,7 @@ class PandaArmControlNode(BaseNode):
         self.is_get_joint_states = False
 
         self.is_created_node=True
-    
+
     def delete_ros2_node(self,):
         """"""
         self.srv_node.destroy_node()
@@ -287,12 +289,8 @@ class PandaArmControlNode(BaseNode):
         joint_states = self.joint_states
         self.is_get_joint_states=False
         finger_joint_posi = joint_states.position[-1]
-        if finger_joint_posi < 0.01:
-            self.set_property('gripper_state', 'close')
-        else:
-            self.set_property('gripper_state', 'open')
-        # print(finger_joint_posi)
-    
+        self.set_property('gripper_position', finger_joint_posi)
+
     def get_end_pose(self,):
         # 通过话题获取当前的机械臂位置状态
         while not self.is_get_end_pose:
@@ -316,34 +314,79 @@ class PandaArmControlNode(BaseNode):
         """"""
         if not self.is_created_node:
             self.create_ros2_node()
-        while not self.cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service not available, waiting again...')
+        while not self.client_arm.wait_for_service(timeout_sec=1.0):
+            self.srv_node.get_logger().info('client_arm not available, waiting again...')
+        while not self.client_gripper.wait_for_service(timeout_sec=1.0):
+            self.srv_node.get_logger().info('client_gripper not available, waiting again...')
         # 通过服务发送位置信号
-        request = ControlRvizArm_Request()
-        request.position = [float(self.get_property('position.x')), 
+        request_arm = ControlRvizArm_Request()
+
+        # 获取上一个节点的位置
+        try:
+            before_node = self.input(0).connected_ports()[0].node()
+            position_before = [before_node.float(self.get_property('position.x')),
+                               before_node.float(self.get_property('position.y')),
+                               before_node.float(self.get_property('position.z')),
+                               before_node.float(self.get_property('orientation.x')),
+                               before_node.float(self.get_property('orientation.y')),
+                               before_node.float(self.get_property('orientation.z')),
+                               before_node.float(self.get_property('orientation.w'))]
+        except Exception as e:
+            position_before = []
+
+        request_arm.position = [float(self.get_property('position.x')), 
                             float(self.get_property('position.y')), 
                             float(self.get_property('position.z')),
                             float(self.get_property('orientation.x')),
                             float(self.get_property('orientation.y')),
                             float(self.get_property('orientation.z')),
                             float(self.get_property('orientation.w'))]
-        request.open_or_close = self.get_property('gripper_state')
+        request_arm.gripper_width = 0.04
+        
+        # 如果上一个节点的位置和当前节点的位置不一致，则执行控制服务
+        if sorted(position_before) != sorted(request_arm.position):
+            future_arm = self.client_arm.call_async(request_arm)
+            rclpy.spin_until_future_complete(self.srv_node, future_arm) # 重复运行这个会报：IndexError: wait set index too big
 
-        # text_in = self.input(0).connected_ports()[0].node().text_out
+            response_arm = future_arm.result()
 
-        # 通过话题获取当前的机械臂位置状态
-        # end_pose = self.get_end_pose()
- 
-        future = self.cli.call_async(request)
-        rclpy.spin_until_future_complete(self.srv_node, future)
+            if response_arm.success:
+                # # # 这里通过服务发送轨迹到panda_joint_monitor的线程
+                while not self.client_send_trajectory.wait_for_service(timeout_sec=1.0):
+                    self.srv_node.get_logger().info('client_send_trajectory not available, waiting again...')
+                request_trajectory = ControlUnityArm_Request()
+                request_trajectory.joint_trajectory = response_arm.joint_trajectory # 将规划结果的轨迹添加到请求中
 
-        response = future.result()
+                future_send_trajectory = self.client_send_trajectory.call_async(request_trajectory)
+                rclpy.spin_until_future_complete(self.srv_node, future_send_trajectory) # 重复运行这个会报：IndexError: wait set index too big
 
-        if response.success:
-            self.messageSignal.emit(f'{request.position} execution was successful.')
+                response_send_trajectory = future_send_trajectory.result()
+
+                if response_send_trajectory.success:
+                    self.srv_node.get_logger().info("Trajectory sent successfully.")
+                else:
+                    self.srv_node.get_logger().info("Failed to send trajectory.")
+
+                self.messageSignal.emit(f'{request_arm.position} execution was successful.')
+                self.text_out = "执行成功！"
+            else:
+                self.messageSignal.emit(f'{request_arm.position} execution failed.')
+                self.text_out = "执行失败！"
+
+        request_gripper = ControlUnityArmGripper_Request()
+        request_gripper.gripper_position = float(self.get_property('gripper_position').strip())
+
+        future_gripper = self.client_gripper.call_async(request_gripper)
+
+        rclpy.spin_until_future_complete(self.srv_node, future_gripper)
+
+        response_gripper = future_gripper.result()
+
+        if response_gripper.success:
+            self.messageSignal.emit(f'response_gripper execution was successful.')
             self.text_out = "执行成功！"
         else:
-            self.messageSignal.emit(f'{request.position} execution failed.')
+            self.messageSignal.emit(f'response_gripper execution failed.')
             self.text_out = "执行失败！"
         
         self.delete_ros2_node()

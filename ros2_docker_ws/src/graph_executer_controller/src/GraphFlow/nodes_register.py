@@ -13,6 +13,7 @@ from threading import Thread
 from nodes import *
 import nodes
 import time
+import traceback
 
 # 然后正常使用 NodeGraphQt
 BASE_PATH = Path(__file__).parent.resolve()
@@ -54,6 +55,9 @@ class GraphFlow(QtCore.QObject):
         self.timeer_check_thread.start(500)
 
         self.init_gui()
+
+        # 是否调试
+        self.is_debug = True
 
     def check_thread_status(self):
         """检查线程状态"""
@@ -110,10 +114,16 @@ class GraphFlow(QtCore.QObject):
             return
         def run_graph(messageSignal):
             """"""
-            try:
+            if self.is_debug:
                 self.get_execution_order(start_node)
-            except Exception as err:
-                messageSignal.emit(f"Thread error: {err}")
+            else:
+                try:
+                    self.get_execution_order(start_node)
+                except Exception as err:
+                    messageSignal.emit(f"Thread error: {err}")
+                    messageSignal.emit(err.__traceback__.tb_frame.f_globals["__file__"])   # 发生异常所在的文件
+                    messageSignal.emit(err.__traceback__.tb_lineno)                        # 发生异常所在的行数
+                
 
         if start_node.NODE_NAME not in self.threads.keys():
             # 可以在这里创建多线程去执行，每一个初始节点创建一个线程
@@ -146,10 +156,16 @@ class GraphFlow(QtCore.QObject):
             """"""
             if obj_node.disabled():
                 return
-            try:
+            if self.is_debug:
                 self.get_execution_order(obj_node)
-            except Exception as err:
-                messageSignal.emit(f"Thread error: {err}")
+            else:
+                try:
+                    self.get_execution_order(obj_node)
+                except Exception as err:
+                    messageSignal.emit(f"Thread error: {err}")
+                    messageSignal.emit(err.__traceback__.tb_frame.f_globals["__file__"])   # 发生异常所在的文件
+                    messageSignal.emit(err.__traceback__.tb_lasti)                        # 发生异常所在的行数
+
 
         # 可以在这里创建多线程去执行，每一个初始节点创建一个线程
         for obj_node in obj_nodes:

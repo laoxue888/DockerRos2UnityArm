@@ -47,10 +47,21 @@ class MainWindow(QMainWindow, QObject):
         """"""
         
         self.graph = GraphFlow(self.messageSignal, self)
+        # try:
+        #     self.graph.graph.load_session(self.userSettings['graph_session'][0])
+        # except Exception as err:
+        #     self.messageSignal.emit(err)
+        
+        self.graph_path = os.path.join(BASE_DIR, "res", "graphs", "process_graph.json")
         try:
-            self.graph.graph.load_session(self.userSettings['graph_session'][0])
+            self.graph.graph.load_session(self.graph_path)
         except Exception as err:
             self.messageSignal.emit(err)
+            try:
+                os.remove(self.graph_path)
+                self.graph._model.session = self.graph_path
+            except Exception as err:
+                pass
 
         # def saveSesionPath():
         #     self.userSettings['graph_session'][0] = self.graph.graph.current_session()
@@ -124,10 +135,11 @@ class MainWindow(QMainWindow, QObject):
             self.messageSignal.emit(err)
 
     def closeEvent(self, event):
-        self.userSettings['graph_session'][0] = self.graph.graph.current_session()
+        # self.userSettings['graph_session'][0] = self.graph.graph.current_session()
         self.saveSettings()
         self.messageSignal.emit("Close time: {}".format(datetime.datetime.now()))
-        self.graph.save_session()
+        # self.graph.save_session()
+        self.graph.graph.save_session(self.graph_path)
         self.graph.close_event()
         return super().closeEvent(event)
 

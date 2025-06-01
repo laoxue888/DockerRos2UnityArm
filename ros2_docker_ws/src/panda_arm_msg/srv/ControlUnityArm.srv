@@ -1,0 +1,6 @@
+# 机械臂轨迹
+trajectory_msgs/JointTrajectory joint_trajectory
+
+---
+# 是否发出成功
+bool success

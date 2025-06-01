@@ -5,6 +5,7 @@ from launch import LaunchDescription
 import os
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument, ExecuteProcess
+from moveit_configs_utils.launches import generate_demo_launch
 
 
 def generate_launch_description():
@@ -22,15 +23,16 @@ def generate_launch_description():
         .to_moveit_configs()
     )
 
-    return LaunchDescription(
+    launch_description = LaunchDescription(
         [
             Node(
                 name="moveit_py",
                 package='control_server',
-                executable='panda_arm_mover_server',
+                executable='unity_panda_arm_mover_server',
                 output="both",
                 parameters=[moveit_config.to_dict(),
                             {"use_sim_time": True},
+                            {"limited":False},
                         ],
             ),
             Node(
@@ -56,5 +58,12 @@ def generate_launch_description():
             #     {'ROS_TCP_PORT': 10000},
             # ],
             # ),
-        ]
+        ] 
     )
+
+    # 获取原有的launch描述
+    # rviz_moveit_config = MoveItConfigsBuilder("panda", package_name="panda_moveit_config").to_moveit_configs()
+    # rviz_demo_launch = generate_demo_launch(moveit_config)
+    # launch_description.add_action(rviz_demo_launch)
+
+    return launch_description

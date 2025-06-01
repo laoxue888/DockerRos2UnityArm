@@ -24,7 +24,8 @@ setup(
     entry_points={
         'console_scripts': [
             'panda_joint_monitor = control_server.panda_joint_monitor:main',
-            'panda_arm_mover_server = control_server.panda_arm_mover_server:main', 
+            'rviz_panda_arm_mover_server = control_server.rviz_panda_arm_mover_server:main', 
+            'unity_panda_arm_mover_server = control_server.unity_panda_arm_mover_server:main', 
             'get_end_position = control_server.get_end_position:main',
         ],
     },

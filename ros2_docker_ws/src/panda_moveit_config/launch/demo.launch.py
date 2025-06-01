@@ -19,7 +19,7 @@ def generate_launch_description():
     # 获取原有的launch描述
     demo_launch = generate_demo_launch(moveit_config)
     
-    # # 创建您想要添加的节点
+    # # # 创建您想要添加的节点
     # arm_robot_sim_path = os.path.join(get_package_share_directory('panda_moveit_config'))
     
     # moveit_config = (
@@ -43,7 +43,7 @@ def generate_launch_description():
     
     # 将原有launch描述和新节点组合
     launch_description = LaunchDescription()
-    launch_description.add_action(demo_launch)
     # launch_description.add_action(example_node)
+    launch_description.add_action(demo_launch)
     
     return launch_description

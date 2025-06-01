@@ -149,7 +149,6 @@ class Ui_MainWindow(object):
         self.menuTools.addAction(self.actionexetute_from_goal_node)
         self.menuTools.addAction(self.actionexecute_graph)
         self.toolBar.addAction(self.actionexetute_from_goal_node)
-        self.toolBar.addAction(self.actionexecute_graph)
 
         self.retranslateUi(MainWindow)
 

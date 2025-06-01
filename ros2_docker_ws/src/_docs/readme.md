@@ -63,15 +63,14 @@ apt-get update && apt-get install -y alsa-utils pulseaudio
 aplay -L  # 列出音频设备
 # speaker-test -t wav  # 测试播放
 
+
 # 使用清华源下载
 cd src/graph_executer_controller/
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --break-system-packages
 pip install pyqtgraph ultralytics --break-system-packages
 
-
 # 调试工具
 python3 -m pip install ipykernel -U --user --force-reinstall -i https://pypi.tuna.tsinghua.edu.cn/simple --break-system-packages
-
 
 # 配置Ubuntu支持中文
 sudo apt-get install language-pack-zh-hans -y
@@ -131,6 +130,8 @@ apt install ros-${ROS_DISTRO}-gz-ros2-control -y
 
 ![alt text](images/image.png)
 
+❇️启动Unity
+
 ❇️编译项目
 
 ```shell    
@@ -168,6 +169,21 @@ ros2 launch panda_moveit_config demo.launch.py
 
 # 改进
 
+## 添加删除节点前的函数调用
+
+问题描述：由于nodegraphqt没有删除节点的操作，这里为其添加。
+
+在`/usr/local/lib/python3.12/dist-packages/NodeGraphQt/base/graph.py`的`NodeGraph`类的`delete_node(self, node, push_undo=True)`函数中添加以下内容：
+
+![alt text](images/image-1.png)
+
+```python
+if hasattr(node, '_del_node'):
+    node._del_node()
+```
+
+# 报错
+
 ##  ❌框选节点的时候报错
 
 ```shell
@@ -203,15 +219,24 @@ self.scene().setSelectionArea(
 )
 ```
 
-## 添加删除节点前的函数调用
 
-问题描述：由于nodegraphqt没有删除节点的操作，这里为其添加。
+## ❌如果无法控制机械臂，查看rviz2的终端，应该会有
 
-在`/usr/local/lib/python3.12/dist-packages/NodeGraphQt/base/graph.py`的`NodeGraph`类的`delete_node(self, node, push_undo=True)`函数中添加以下内容：
-
-![alt text](images/image-1.png)
-
-```python
-if hasattr(node, '_del_node'):
-    node._del_node()
+```shell
+[move_group-3] [ERROR] [1748613208.480924749] [move_group.moveit.moveit.ros.check_start_state_bounds]: Joint 'panda_joint2' from the starting state is outside bounds by: [1.76294 ] should be in the range [-1.7628 ], [1.7628 ].
+[move_group-3] [ERROR] [1748613208.480986559] [move_group]: PlanningRequestAdapter 'CheckStartStateBounds' failed, because 'Start state out of bounds.'. Aborting planning pipeline.
 ```
+
+✔️:重新启动rviz2即可
+
+## ❌规划路径超出范围
+
+```shell
+[ERROR] [1742603349.012384448] [moveit_3836862178.moveit.ros.check_start_state_bounds]: Joint 'panda_finger_joint1' from the starting state is outside bounds by: [-6.61565e-14 ] should be in the range [0 ], [0.04 ].
+[ERROR] [1742603349.012503158] [moveit_py]: PlanningRequestAdapter 'CheckStartStateBounds' failed, because 'Start state out of bounds.'. Aborting planning pipeline.
+[ERROR] [1742603349.013678982] [moveit_py.pose_goal]: Planning failed
+```
+
+✔️修改`joint_limits.yaml`，限制关节的最大最小位置
+
+![alt text](images/image-2.png)

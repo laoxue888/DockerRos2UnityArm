@@ -1,0 +1,6 @@
+# 设置gripper的开度
+float64 gripper_position
+
+---
+# 是否发出成功
+bool success
