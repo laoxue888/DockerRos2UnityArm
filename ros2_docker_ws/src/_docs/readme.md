@@ -240,3 +240,8 @@ self.scene().setSelectionArea(
 ✔️修改`joint_limits.yaml`，限制关节的最大最小位置
 
 ![alt text](images/image-2.png)
+
+
+# 其他
+
+`rclpy.spin_until_future_complete`运行这个函数时，注意不要有其他的spin这个节点的函数，否则会卡住。
