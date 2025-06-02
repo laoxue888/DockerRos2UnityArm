@@ -2,9 +2,14 @@
 
 ---
 
-## 前言（Introduction）
+## 前言
 
 本项目介绍通过Unity3D仿真Panda机械臂，为研究机械臂的控制算法、控制效果和构建复杂仿真环境提供虚拟化平台。
+
+
+|![ ](images/2025-5-18.gif)|![ ](images/2025-6-2.gif)|
+|:---:|:---:|
+|2025-5-18|2025-6-2|
 
 要点：
 
@@ -13,39 +18,24 @@
 - `matlab`：包含了验证机械臂位置正逆运动学的算法分析
 
 > **video:**
+> - [2025-6-2:YOLO机械臂丨使用unity搭建仿真环境，YOLO算法识别，Moveit2控制](https://www.bilibili.com/video/BV1657mzFEdd/?vd_source=3bf4271e80f39cfee030114782480463)
 > - [2025-5-18: 机械臂位置正逆运动学原理与代码](https://www.bilibili.com/video/BV1ghJGzJEnp/?vd_source=3bf4271e80f39cfee030114782480463)
 > - [2025-4-13: ros2-rviz2控制unity仿真的6关节机械臂，探索从仿真到实际应用的过程](https://www.bilibili.com/video/BV1E9dkYAEkX/?vd_source=3bf4271e80f39cfee030114782480463)
 
 
-
-> **参考：**
-> - [docker-ros2-unity-tcp-endpoint](https://github.com/frankjoshua/docker-ros2-unity-tcp-endpoint/tree/master)
-> - [Robotics-Nav2-SLAM-Example](https://github.com/Unity-Technologies/Robotics-Nav2-SLAM-Example?tab=readme-ov-file)
-> - [unity坐赛车游戏，简单三分钟了解一下](https://www.bilibili.com/video/BV1LU4y1o7re/?vd_source=3bf4271e80f39cfee030114782480463)
-> - [How to Setup Unity and ROS2 in less than 5 minutes!](https://www.youtube.com/watch?v=1X6uzrvNwCk)
-> - [ros2-for-unity](https://github.com/RobotecAI/ros2-for-unity)
-> - [moveit2_yolobb_ws](https://github.com/laoxue888/moveit2_yolobb_ws)
-> - [Unity-Robotics-Hub](https://github.com/Unity-Technologies/Unity-Robotics-Hub)
-> - [JSON Output](https://api-docs.deepseek.com/zh-cn/guides/json_mode)
-> - [DeepSeek提示库](https://api-docs.deepseek.com/zh-cn/prompt-library/)
-> - [Binary Installation on Ubuntu](https://gazebosim.org/docs/harmonic/install_ubuntu/)
-> - [Docs / Gazebo Harmonic](https://gazebosim.org/docs/harmonic/getstarted/)
-> - [ros_gz branch jazzy](https://github.com/gazebosim/ros_gz/tree/jazzy)
-
-
-## 搭建开发环境（Setup Development Environment）
+## 搭建开发环境
 
 > - Unity:2022
 > - Ubuntu:24.04
 > - Ros2:jazzy
 
-## 在window中安装Unity（Install Unity in window）
+## 在window中安装Unity
 
 先安装Unityhuyb，然后再安装Unity
 
 [https://unity.cn/releases](https://unity.cn/releases)
 
-## 创建Docker容器，并安装相关软件（Create Docker containers and install related software）
+## 创建Docker容器，并安装相关软件
 
 ❇️创建Docker容器
 
@@ -92,10 +82,8 @@ cd src/graph_executer_controller/
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --break-system-packages
 pip install pyqtgraph ultralytics --break-system-packages
 
-
 # 调试工具
 python3 -m pip install ipykernel -U --user --force-reinstall -i https://pypi.tuna.tsinghua.edu.cn/simple --break-system-packages
-
 
 # 配置Ubuntu支持中文
 sudo apt-get install language-pack-zh-hans -y
@@ -120,41 +108,16 @@ sudo apt-get install fonts-droid-fallback ttf-wqy-zenhei ttf-wqy-microhei fonts-
 
 # 安装支持playsound的库
 apt-get install libgstrtspserver-1.0-dev gstreamer1.0-rtsp -y
-
-# 安装mujoco
-mkdir /opt/mujoco_softwares
-cd /opt/mujoco_softwares/
-wget https://github.com/google-deepmind/mujoco/releases/download/3.3.2/mujoco-3.3.2-linux-x86_64.tar.gz
-tar xvzf mujoco-3.3.2-linux-x86_64.tar.gz 
-echo "export PATH=$PATH:/opt/mujoco_softwares/mujoco-3.3.2/bin" >> ~/.bashrc
-source ~/.bashrc
-# 测试
-#simulate /opt/mujoco_softwares/mujoco-3.3.2/model/humanoid/humanoid.xml
-pip install mujoco -i https://pypi.tuna.tsinghua.edu.cn/simple --break-system-packages
-
-# 安装gz
-sudo apt-get update
-sudo apt-get install curl lsb-release gnupg
-
-sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-sudo apt-get update
-sudo apt-get install gz-harmonic
-
-sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
-curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-sudo apt-get update
-sudo apt install ros-jazzy-ros-gz -y
-
-apt install ros-${ROS_DISTRO}-gz-ros2-control -y
 ```
 
-## 运行测试（Run test）
+## 运行测试
 
 
 ❇️在windows上运行`PulseAudio`服务
 
 ![alt text](images/image.png)
+
+❇️启动Unity
 
 ❇️编译项目
 
@@ -191,7 +154,23 @@ ros2 launch panda_moveit_config demo.launch.py
 ```
 > 启动rviz2后，可以看到机械臂会有干涉，现手动调整到不干涉的位置，然后才使用moveitpy控制机械臂，否则无法控制机械臂。
 
+
 # 改进
+
+## 添加删除节点前的函数调用
+
+问题描述：由于nodegraphqt没有删除节点的操作，这里为其添加。
+
+在`/usr/local/lib/python3.12/dist-packages/NodeGraphQt/base/graph.py`的`NodeGraph`类的`delete_node(self, node, push_undo=True)`函数中添加以下内容：
+
+![alt text](images/image-1.png)
+
+```python
+if hasattr(node, '_del_node'):
+    node._del_node()
+```
+
+# 报错
 
 ##  ❌框选节点的时候报错
 
@@ -228,15 +207,40 @@ self.scene().setSelectionArea(
 )
 ```
 
-## 添加删除节点前的函数调用
 
-问题描述：由于nodegraphqt没有删除节点的操作，这里为其添加。
+## ❌如果无法控制机械臂，查看rviz2的终端，应该会有
 
-在`/usr/local/lib/python3.12/dist-packages/NodeGraphQt/base/graph.py`的`NodeGraph`类的`delete_node(self, node, push_undo=True)`函数中添加以下内容：
-
-![alt text](images/image-1.png)
-
-```python
-if hasattr(node, '_del_node'):
-    node._del_node()
+```shell
+[move_group-3] [ERROR] [1748613208.480924749] [move_group.moveit.moveit.ros.check_start_state_bounds]: Joint 'panda_joint2' from the starting state is outside bounds by: [1.76294 ] should be in the range [-1.7628 ], [1.7628 ].
+[move_group-3] [ERROR] [1748613208.480986559] [move_group]: PlanningRequestAdapter 'CheckStartStateBounds' failed, because 'Start state out of bounds.'. Aborting planning pipeline.
 ```
+
+✔️:重新启动rviz2即可
+
+## ❌规划路径超出范围
+
+```shell
+[ERROR] [1742603349.012384448] [moveit_3836862178.moveit.ros.check_start_state_bounds]: Joint 'panda_finger_joint1' from the starting state is outside bounds by: [-6.61565e-14 ] should be in the range [0 ], [0.04 ].
+[ERROR] [1742603349.012503158] [moveit_py]: PlanningRequestAdapter 'CheckStartStateBounds' failed, because 'Start state out of bounds.'. Aborting planning pipeline.
+[ERROR] [1742603349.013678982] [moveit_py.pose_goal]: Planning failed
+```
+
+✔️修改`joint_limits.yaml`，限制关节的最大最小位置
+
+![alt text](ros2_docker_ws/src/_docs/images/image-2.png)
+
+
+# 参考
+
+> - [docker-ros2-unity-tcp-endpoint](https://github.com/frankjoshua/docker-ros2-unity-tcp-endpoint/tree/master)
+> - [Robotics-Nav2-SLAM-Example](https://github.com/Unity-Technologies/Robotics-Nav2-SLAM-Example?tab=readme-ov-file)
+> - [unity坐赛车游戏，简单三分钟了解一下](https://www.bilibili.com/video/BV1LU4y1o7re/?vd_source=3bf4271e80f39cfee030114782480463)
+> - [How to Setup Unity and ROS2 in less than 5 minutes!](https://www.youtube.com/watch?v=1X6uzrvNwCk)
+> - [ros2-for-unity](https://github.com/RobotecAI/ros2-for-unity)
+> - [moveit2_yolobb_ws](https://github.com/laoxue888/moveit2_yolobb_ws)
+> - [Unity-Robotics-Hub](https://github.com/Unity-Technologies/Unity-Robotics-Hub)
+> - [JSON Output](https://api-docs.deepseek.com/zh-cn/guides/json_mode)
+> - [DeepSeek提示库](https://api-docs.deepseek.com/zh-cn/prompt-library/)
+> - [Binary Installation on Ubuntu](https://gazebosim.org/docs/harmonic/install_ubuntu/)
+> - [Docs / Gazebo Harmonic](https://gazebosim.org/docs/harmonic/getstarted/)
+> - [ros_gz branch jazzy](https://github.com/gazebosim/ros_gz/tree/jazzy)
