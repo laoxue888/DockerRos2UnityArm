@@ -16,6 +16,7 @@
 - `PandaArmUnity3D`：`Unity3D`项目
 - `ros2_docker_ws`：`ros2`项目
 - `matlab`：包含了验证机械臂位置正逆运动学的算法分析
+- `pulseaudio-1.1`：window-docker的容器使用宿主机音频设备
 
 
 > **重要文件更新:**
