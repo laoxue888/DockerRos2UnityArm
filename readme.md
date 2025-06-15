@@ -17,6 +17,12 @@
 - `ros2_docker_ws`：`ros2`项目
 - `matlab`：包含了验证机械臂位置正逆运动学的算法分析
 
+
+> **重要文件更新:**
+> - `2025-6-15`: 增加了`ros2_docker_ws\src\_docs\normal_guide\ros2的安装.md`
+
+
+
 > **video:**
 > - [2025-6-2:YOLO机械臂丨使用unity搭建仿真环境，YOLO算法识别，Moveit2控制](https://www.bilibili.com/video/BV1657mzFEdd/?vd_source=3bf4271e80f39cfee030114782480463)
 > - [2025-5-18: 机械臂位置正逆运动学原理与代码](https://www.bilibili.com/video/BV1ghJGzJEnp/?vd_source=3bf4271e80f39cfee030114782480463)
