@@ -37,6 +37,11 @@
 > - Ubuntu:24.04
 > - Ros2:jazzy
 
+## Matlab
+
+安装Robotics Toolbox第三方库
+
+
 ## 在window中安装Unity
 
 先安装Unityhuyb，然后再安装Unity
