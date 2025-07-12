@@ -42,7 +42,10 @@ git clone --recurse-submodules https://github.com/laoxue888/DockerRos2UnityArm.g
 
 ## 运行测试
 
-❇️在windows上运行`PulseAudio`服务
+❇️在windows上双击运行`PulseAudio`服务
+
+> 该服务用于Docker调用宿主机音频设备。
+
 
 ![alt text](docs/images/image.png)
 
