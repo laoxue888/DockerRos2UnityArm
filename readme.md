@@ -22,6 +22,7 @@
 
 
 > **Update:**
+> - [`2025-7-12`: DeepSeek控制Unity中的Panda仿真机械臂](https://blog.csdn.net/laoxue123456/article/details/149295283?spm=1011.2415.3001.5331)
 > - `2025-6-15`: 增加了`docs\实测Ubuntu安装ros2的有效\实测Ubuntu安装ros2的有效.md`
 > - [2025-6-2:YOLO机械臂丨使用unity搭建仿真环境，YOLO算法识别，Moveit2控制](https://www.bilibili.com/video/BV1657mzFEdd/?vd_source=3bf4271e80f39cfee030114782480463)
 > - [2025-5-18: 机械臂位置正逆运动学原理与代码](https://www.bilibili.com/video/BV1ghJGzJEnp/?vd_source=3bf4271e80f39cfee030114782480463)
