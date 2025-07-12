@@ -151,20 +151,22 @@ source install/setup.bash
 ros2 launch control_server arm_control.launch.py
 ```
 
-❇️运行`graph_executer_controller`
-```shell
-# 打开新的终端
-source install/setup.bash
-cd src/graph_executer_controller
-python3 main.py
-```
-
 ❇️运行`panda_moveit_config`的`demo.launch.py`
 ```shell
 # 打开新的终端
 source install/setup.bash
 ros2 launch panda_moveit_config demo.launch.py
 ```
+
+❇️运行`graph_executer`
+```shell
+# 打开新的终端
+source install/setup.bash
+cd src/GraphExecuter/graph_executer
+python3 main.py
+```
+
+
 > 启动rviz2后，可以看到机械臂会有干涉，现手动调整到不干涉的位置，然后才使用moveitpy控制机械臂，否则无法控制机械臂。
 
 
